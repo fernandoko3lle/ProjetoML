@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*.ipynb_checkpoints
+
+# Ambiente virtual
+venv/
+.venv/
+
+# Dados grandes / modelos
+*.wav
+*.mp3
+*.flac
+*.pt
+*.bin
+*.safetensors
+model_cache/
+.cache/
+transcritos/
+audios/
+
+# Ferramentas
+.env
+*.log
+.DS_Store
+.idea/
+.vscode/
