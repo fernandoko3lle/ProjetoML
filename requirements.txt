@@ -1,0 +1,10 @@
+fastapi==0.111.0
+uvicorn[standard]==0.29.0          # servidor ASGI
+sounddevice>=0.4.6                 # captura do microfone
+numpy>=2.2                         # processamento de áudio
+torch==2.2.2                       # backend para Transformers / Whisper  ➜ CPU‐only¹
+transformers==4.41.2               # modelos Hugging Face
+sentencepiece>=0.2.0               # tokenização XLM-R / Whisper
+faster-whisper==1.0.1              # ASR rápido (CPU)²
+rich>=13.7                         # prints coloridos (opcional)
+nest_asyncio>=1.6                  # permite loop de captura dentro do FastAPI
