@@ -6,6 +6,10 @@ from flask_socketio import SocketIO
 from transformers import pipeline
 from faster_whisper import WhisperModel
 
+
+# Helper Functions
+from Projeto.helper import fusion_emotion
+
 # ---------------- Flask ----------------
 app = Flask(__name__, static_url_path="", static_folder=".")
 socketio = SocketIO(app, cors_allowed_origins="*")  # websocket em /socket.io/
@@ -20,16 +24,22 @@ CHUNK = int(0.25 * FS)
 SILENCE_THR = 0.01
 SILENCE_MAX = 2          # 0.5 s * 2  => 1 s
 
-ser = pipeline("audio-classification",
-               model="superb/wav2vec2-base-superb-er",
-               sampling_rate=FS)
+ser = pipeline(
+    "audio-classification",
+    model="superb/wav2vec2-base-superb-er",
+    sampling_rate=FS
+)
 VAL_SER = {"ang": -1, "sad": -0.5, "neu": 0, "hap": +1}
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
-asr = WhisperModel("small", device=device,
-                   compute_type="float16" if device=="cuda" else "int8")
-sent = pipeline("text-classification",
-                model="cardiffnlp/xlm-roberta-base-tweet-sentiment-pt")
+asr = WhisperModel(
+    "small", device=device,
+    compute_type="float16" if device=="cuda" else "int8"
+)
+sent = pipeline(
+    "text-classification",
+    model="cardiffnlp/xlm-roberta-base-tweet-sentiment-pt"
+)
 VAL_TXT = {"negative": -1, "neutral": 0, "positive": +1}
 
 # ------------- captura de áudio -------------
@@ -65,14 +75,21 @@ def capturar():
                     res_t = {"label": "neutral", "score": 1.0}
                     val_t = 0
 
+                fusion = fusion_emotion(res_a["label"], val_a, res_t["label"], val_t)
+
                 out = {
-                    "audio": {"label": res_a["label"],
-                              "confidence": round(res_a["score"], 3),
-                              "valence": val_a},
-                    "texto": {"transcricao": text,
-                              "label": res_t["label"],
-                              "confidence": round(res_t["score"], 3),
-                              "valence": val_t}
+                    "audio": {
+                        "label": res_a["label"],
+                        "confidence": round(res_a["score"], 3),
+                        "valence": val_a
+                    },
+                    "texto": {
+                        "transcricao": text,
+                        "label": res_t["label"],
+                        "confidence": round(res_t["score"], 3),
+                        "valence": val_t
+                    },
+                    "emocao4": fusion
                 }
                 # envia p/ browser
                 

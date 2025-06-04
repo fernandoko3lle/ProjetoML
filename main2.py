@@ -3,6 +3,8 @@ import sounddevice as sd, numpy as np, torch, json, time
 from transformers import pipeline
 from faster_whisper import WhisperModel
 
+# Helper Functions
+
 FS = 16_000
 CHUNK = int(0.25 * FS)             # 0.5 s
 SILENCE_THR = 0.01                # RMS abaixo disto é “silêncio”
@@ -59,10 +61,13 @@ with sd.InputStream(channels=1, samplerate=FS, blocksize=CHUNK) as stream:
                     res_t = {"label": "neutral", "score": 1.0}
                     val_t = 0
 
+
                 out = {
                     "audio": {"label": res_a["label"], "conf": round(res_a["score"],3), "valence": val_a},
-                    "texto": {"transcricao": text, "label": res_t["label"], "conf": round(res_t["score"],3), "valence": val_t}
+                    "texto": {"transcricao": text, "label": res_t["label"], "conf": round(res_t["score"],3), "valence": val_t},
                 }
+                
+
                 print(json.dumps(out, ensure_ascii=False, indent=2))
 
     except KeyboardInterrupt:

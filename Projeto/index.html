@@ -14,6 +14,11 @@
     .valence-fill{height:100%;border-radius:10px;position:absolute;left:50%}
     .neg{background:#f44336}.neu{background:#9e9e9e}.pos{background:#4caf50}
     code{background:#f6f6f6;padding:2px 4px;border-radius:4px}
+
+    .alegria  {color:#4caf50}
+    .raiva    {color:#f44336}
+    .medo     {color:#9c27b0}
+    .surpresa {color:#ffc107}
   </style>
 </head>
 <body>
@@ -34,6 +39,11 @@
       <p><b>Conf.:</b> <span id="conf-t">—</span></p>
       <div class="valence-bar"><div id="val-t" class="valence-fill neu"></div></div>
     </div>
+
+    <div class="card">
+      <h2>Emoção (4-classes)</h2>
+      <p id="emo4">-</p>
+    </div>
   </div>
 
 <script>
@@ -49,6 +59,11 @@ ioSocket.on("sentimento", data => {
   document.getElementById("lab-t").textContent  = data.texto.label;
   document.getElementById("conf-t").textContent = data.texto.confidence;
   atualizarBarra("val-t", data.texto.valence);
+
+  // ---- emoção (4-classes) ----
+  document.getElementById("emo4").textContent = data.emocao4;
+  const e4 = document.getElementById("emo4");
+  e4.className = data.emocao4;
 });
 
 // preenche de –1 a +1 ➜ largura 0–50% esquerda ou direita
