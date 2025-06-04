@@ -8,7 +8,7 @@ from faster_whisper import WhisperModel
 
 
 # Helper Functions
-from Projeto.helper import fusion_emotion
+from helper import fusion_emotion
 
 # ---------------- Flask ----------------
 app = Flask(__name__, static_url_path="", static_folder=".")
