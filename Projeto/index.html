@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <title>Sentimento em tempo real</title>
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+
+  <style>
+    body{font-family:sans-serif;max-width:780px;margin:40px auto;padding:0 20px}
+    h1{margin-bottom:10px}
+    .painel{display:flex;gap:1.5rem;margin:1rem 0}
+    .card{flex:1;border:1px solid #ccc;border-radius:8px;padding:1rem}
+    .valence-bar{height:20px;background:#e0e0e0;border-radius:10px;position:relative;margin-top:6px}
+    .valence-fill{height:100%;border-radius:10px;position:absolute;left:50%}
+    .neg{background:#f44336}.neu{background:#9e9e9e}.pos{background:#4caf50}
+    code{background:#f6f6f6;padding:2px 4px;border-radius:4px}
+  </style>
+</head>
+<body>
+  <h1>🎧 Sentimento em tempo real</h1>
+
+  <div class="painel">
+    <div class="card">
+      <h2>Áudio</h2>
+      <p><b>Label:</b> <span id="lab-a">—</span></p>
+      <p><b>Conf.:</b> <span id="conf-a">—</span></p>
+      <div class="valence-bar"><div id="val-a" class="valence-fill neu"></div></div>
+    </div>
+
+    <div class="card">
+      <h2>Texto</h2>
+      <p><b>Transcrição:</b> <code id="txt">—</code></p>
+      <p><b>Label:</b> <span id="lab-t">—</span></p>
+      <p><b>Conf.:</b> <span id="conf-t">—</span></p>
+      <div class="valence-bar"><div id="val-t" class="valence-fill neu"></div></div>
+    </div>
+  </div>
+
+<script>
+const ioSocket = io();             // conecta ao /socket.io/ do Flask
+ioSocket.on("sentimento", data => {
+  // ---- áudio ----
+  document.getElementById("lab-a").textContent  = data.audio.label;
+  document.getElementById("conf-a").textContent = data.audio.confidence;
+  atualizarBarra("val-a", data.audio.valence);
+
+  // ---- texto ----
+  document.getElementById("txt").textContent    = data.texto.transcricao || "—";
+  document.getElementById("lab-t").textContent  = data.texto.label;
+  document.getElementById("conf-t").textContent = data.texto.confidence;
+  atualizarBarra("val-t", data.texto.valence);
+});
+
+// preenche de –1 a +1 ➜ largura 0–50% esquerda ou direita
+function atualizarBarra(id, val){
+  const el = document.getElementById(id);
+  const pct = Math.abs(val) * 50;        // 50% é o máximo (±1)
+  el.style.width = pct + "%";
+  el.style[val < 0 ? "right" : "left"] = "50%";
+  el.className = "valence-fill " + (val<0 ? "neg" : val>0 ? "pos" : "neu");
+}
+</script>
+</body>
+</html>
